@@ -5,21 +5,25 @@ int main()
   fstream in("input.in", fstream::in);
   fstream out("output.out", fstream::out);
 
-  string currCalories;
-  int    totalCalories = 0, elfCalories = 0;
+  string      currCalories;
+  vector<int> elvesCalories;
+  int         elfCalories = 0;
 
   while (getline(in, currCalories))
   {
     if (currCalories == "")
     {
-      totalCalories = std::max(elfCalories, totalCalories);
-      elfCalories   = 0;
+      elvesCalories.push_back(elfCalories);
+      elfCalories = 0;
     }
     else
       elfCalories += stoi(currCalories);
   }
 
-  out << totalCalories;
+  if (elfCalories != 0)
+    elvesCalories.push_back(elfCalories);
+
+  out << *max_element(begin(elvesCalories), end(elvesCalories));
 
   in.close();
   out.close();

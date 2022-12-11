@@ -1,97 +1,107 @@
 #include "../../AOCHeaders/stdafx.h"
 
+long long GCD(long long a, long long b)
+{
+  if (b == 0)
+    return a;
+  return GCD(b, a % b);
+}
+
+// Returns LCM of array elements
+long long FindLCM(const vector<long long> & div)
+{
+  // Initialize result
+  long long ans = div[0];
+
+  // ans contains LCM of div[0], ..div[i]
+  // after i'th iteration
+  for (const auto & num : div)
+    ans = (num * ans) / (GCD(num, ans));
+
+  return ans;
+}
+
 int main()
 {
   fstream in("input.in", fstream::in);
   fstream out("output.out", fstream::out);
 
-  string    line, aux;
-  long long n = 0;
-  char      c;
+  string line, aux;
+  char   c;
 
   vector<vector<long long>>  items;
   vector<pair<char, string>> op;
-  vector<long long>          div;
-
-  vector<long long> T;
-  vector<long long> F;
+  vector<long long>          div, T, F;
 
   while (getline(in, line))
   {
+    // Read starting items
     getline(in, line);
-    stringstream ss(line);
-    ss >> aux >> aux;
-    vector<long long> nr;
-    while (ss >> n)
-    {
-      nr.push_back(n);
-      ss >> aux;
-    }
-    items.push_back(nr);
+    stringstream ssItems(line);
 
+    vector<long long> currItems;
+    long long         item = 0;
+    ssItems >> aux >> aux;
+    while (ssItems >> item)
+    {
+      currItems.push_back(item);
+      ssItems >> aux;
+    }
+    items.push_back(currItems);
+
+    // Read operation
     getline(in, line);
-    stringstream ss2(line);
-    ss2 >> aux >> aux >> aux;
-    ss2 >> aux;
-    ss2 >> c >> aux;
+    stringstream ssOp(line);
+    ssOp >> aux >> aux >> aux >> aux >> c >> aux;
     op.push_back({ c, aux });
 
+    // Read test
     getline(in, line);
-    stringstream ss3(line);
-    ss3 >> aux >> aux >> aux >> n;
-    div.push_back(n);
+    stringstream ssTest(line);
+    ssTest >> aux >> aux >> aux >> item;
+    div.push_back(item);
 
+    // Read if true
     getline(in, line);
-    stringstream ss34(line);
-    ss34 >> aux >> aux >> aux >> aux >> aux >> n;
-    T.push_back(n);
+    stringstream ssTestTrue(line);
+    ssTestTrue >> aux >> aux >> aux >> aux >> aux >> item;
+    T.push_back(item);
 
+    // Read if false
     getline(in, line);
-    stringstream ss354(line);
-    ss354 >> aux >> aux >> aux >> aux >> aux >> n;
-    F.push_back(n);
+    stringstream ssTestFalse(line);
+    ssTestFalse >> aux >> aux >> aux >> aux >> aux >> item;
+    F.push_back(item);
+
+    // Ignore empty line
     getline(in, line);
   }
 
-  vector<long long> times(10, 0);
-  long long         rounds = 0;
-  while (rounds < 10000)
+  vector<long long> inspected(items.size(), 0);
+  int               lcm = FindLCM(div);
+  for (int round = 0; round < 10000; round++)
   {
-    for (long long i = 0; i < items.size(); i++)
+    for (int i = 0; i < items.size(); i++)
     {
-      char      oper  = op[i].first;
-      long long numar = 0;
-      long long newNr = 0;
-      for (long long j = 0; j < items[i].size(); j++)
+      int number = 0;
+      for (const auto & item : items[i])
       {
-        if (op[i].second == "old")
-          numar = items[i][j];
-        else
-          numar = stoi(op[i].second);
+        number = op[i].second == "old" ? item : stoi(op[i].second);
 
-        if (oper == '+')
-          newNr = items[i][j] + numar;
-        else
-          newNr = items[i][j] * numar;
+        long long newItem = 0;
+        newItem           = (op[i].first == '+') ? (item + number) % lcm : (item * number) % lcm;
 
-        // first I tried module only (% div[i]) and i was on the right path but gave up when didn't
-        // got the desired result then I tried with patterns there are no patters :) came back to
-        // module and tried least common multiple
-        newNr = newNr % 9699690;
-        // newNr = newNr % 96577; (example)
-        if (newNr % div[i] == 0)
-          items[T[i]].push_back(newNr);
+        if (newItem % div[i] == 0)
+          items[T[i]].push_back(newItem);
         else
-          items[F[i]].push_back(newNr);
+          items[F[i]].push_back(newItem);
       }
-      times[i] += items[i].size();
+      inspected[i] += items[i].size();
       items[i].clear();
     }
-    rounds++;
   }
-
-  sort(begin(times), end(times));
-  out << times[times.size() - 1] * times[times.size() - 2];
+  nth_element(begin(inspected), begin(inspected) + 1, end(inspected), greater<long long>());
+  out << inspected[0] * inspected[1];
 
   in.close();
   out.close();

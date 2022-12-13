@@ -1,29 +1,24 @@
-#include "../AOCHeaders/stdafx.h"
+#include "../../AOCHeaders/stdafx.h"
+
+bool IsBetween(int p, int x, int y)
+{
+  return (p >= x && p <= y);
+}
 
 int main()
 {
-    fstream in("input.in", fstream::in);
-    fstream out("output.out", fstream::out);
+  fstream in("input.in", fstream::in);
+  fstream out("output.out", fstream::out);
 
-    char c{};
-    int s = 0, s1 = 0, x1 = 0, x2 = 0, sum = 0;
-    
-    while (in >> s >> c >> s1 >> c >> x1 >> c >> x2)
-    {
-        vector<int> v(1000, 0);
-        for (int i = s; i <= s1; i++)
-            v[i]++;
-        for (int i = x1; i <= x2; i++)
-            v[i]++;
-        for (int i = 0; i < 1000; i++)
-            if (v[i] == 2)
-            {
-                sum++;
-                break;
-            }
-    }
-    cout << sum;
+  int  x = 0, y = 0, x2 = 0, y2 = 0, count = 0;
+  char c{};
 
-    in.close();
-    out.close();
+  while (in >> x >> c >> y >> c >> x2 >> c >> y2)
+    if (IsBetween(x, x2, y2) || IsBetween(y, x2, y2) || IsBetween(x2, x, y) || IsBetween(y2, x, y))
+      count++;
+
+  out << count;
+
+  in.close();
+  out.close();
 }

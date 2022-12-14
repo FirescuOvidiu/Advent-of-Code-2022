@@ -19,7 +19,7 @@ int main()
     highY = max(y, highY);
     while (ss >> x2 >> c >> y2)
     {
-      highY = max(y, highY);
+      highY = max(y2, highY);
 
       for (int i = min(y, y2); i <= max(y, y2); i++)
         for (int j = min(x, x2); j <= max(x, x2); j++)

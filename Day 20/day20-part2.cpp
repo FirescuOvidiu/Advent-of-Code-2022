@@ -30,8 +30,7 @@ int main()
         }
       }
 
-      while (finalPos < 0 || finalPos >= v.size())
-        finalPos = (finalPos + (long long)811589153 * v.size()) % v.size();
+      finalPos = (finalPos + (long long)(LLONG_MAX / v.size() - 1) * v.size()) % v.size();
 
       auto itFinalPos = begin(v);
       while (finalPos-- > 0)
